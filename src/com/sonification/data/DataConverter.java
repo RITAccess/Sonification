@@ -15,7 +15,7 @@ public class DataConverter {
 	
 	private File file;
 	
-	DataConverter(File file){
+	public DataConverter(File file){
 		this.file = file;
 	}
 	
@@ -24,7 +24,7 @@ public class DataConverter {
 		return FileType.CSV;
 	}
 	
-	private Data readCSVFile() {
+	public Data readCSVFile() {
 		String[] titles = {""};
 		ArrayList<String[]> data = new ArrayList<String[]>();
 		BufferedReader br = null;
