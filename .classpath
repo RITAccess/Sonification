@@ -11,5 +11,7 @@
 	<classpathentry kind="lib" path="lib/org-jaudiolibs-audioservers.jar"/>
 	<classpathentry kind="lib" path="lib/org-jaudiolibs-jnajack.jar"/>
 	<classpathentry kind="lib" path="lib/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="/jbrick/lib/jna.jar"/>
+	<classpathentry kind="lib" path="/jbrick/lib/AppleJavaExtensions.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
