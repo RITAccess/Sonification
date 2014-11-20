@@ -130,6 +130,5 @@ public class Graph extends JPanel {
 		f.add(new Graph(new DataConverter(new File("/Users/Student/Downloads/download.csv")).readCSVFile()));
 		f.pack();
 		f.setVisible(true);
-
 	}
 }

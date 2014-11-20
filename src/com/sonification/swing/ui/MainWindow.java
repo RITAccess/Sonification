@@ -1,33 +1,20 @@
 package com.sonification.swing.ui;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Toolkit;
-import java.awt.geom.Ellipse2D;
+import java.io.File;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultButtonModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
+
+import com.sonification.data.DataConverter;
+import com.sonification.graph.Graph;
 
 public class MainWindow extends JFrame {
 	
 	MenuAndToolBar menuBar = new MenuAndToolBar();
-	GraphPanel graph = new GraphPanel();
 	
 	public MainWindow() {
 		
@@ -51,7 +38,7 @@ public class MainWindow extends JFrame {
 		
 		JButton playButton = new JButton("Play");
 		
-		GraphPanel viewPanel = new GraphPanel();
+		Graph viewPanel = new Graph(new DataConverter(new File("/Users/Student/Downloads/download.csv")).readCSVFile());
 		mainPanel.add(viewPanel);
 		mainPanel.add(playButton);
 		
