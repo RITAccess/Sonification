@@ -2,14 +2,12 @@ package com.sonification.swing.ui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.sonification.data.DataConverter;
 import com.sonification.graph.Graph;
 
 public class MainWindow extends JFrame {
@@ -38,7 +36,7 @@ public class MainWindow extends JFrame {
 		
 		JButton playButton = new JButton("Play");
 		
-		Graph viewPanel = new Graph(new DataConverter(new File("/Users/Student/Downloads/download.csv")).readCSVFile());
+		Graph viewPanel = new Graph("/Users/Student/Downloads/download.csv");
 		mainPanel.add(viewPanel);
 		mainPanel.add(playButton);
 		

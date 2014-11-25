@@ -29,6 +29,15 @@ public class Graph extends JPanel {
 	private Double multiplyVar = 1.0;
 	private Color[] colors;
 	
+	public Graph(String filepath){
+		this(new File(filepath));
+	}
+	
+	public Graph(File file){
+		this(new DataConverter(file).readCSVFile());
+		
+	}
+	
 	public Graph(Data data){
 		Random rnd = new Random((long) Math.random()); // for colors of path
 		
@@ -127,7 +136,7 @@ public class Graph extends JPanel {
 	public static void main(String[] args) {
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.add(new Graph(new DataConverter(new File("/Users/Student/Downloads/download.csv")).readCSVFile()));
+		f.add(new Graph("/Users/Student/Downloads/download.csv"));
 		f.pack();
 		f.setVisible(true);
 	}
