@@ -15,7 +15,7 @@ public class SonificationLauncher {
 		
 		try {
 			if (Platform.isMac()) {
-				System.getProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
 				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Sonification");
 			}
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

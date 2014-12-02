@@ -6,7 +6,11 @@ import java.util.HashMap;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
+import com.sonification.swing.actions.OpenAction;
+import com.sun.glass.events.KeyEvent;
 import com.sun.jna.Platform;
 
 
@@ -40,7 +44,15 @@ public class MenuAndToolBar {
 	 * @author Melissa Young
 	 */
 	enum ActionSet{
+		OPEN(OpenAction.class, "Open File", KeyStroke.getKeyStroke(KeyEvent.VK_O, modifier), MenuEnum.FILE),;
 		
+		JMenuItem mi;
+		
+		ActionSet(Class action, String name, KeyStroke eventKeys, MenuEnum ... parents) {
+			
+			mi = new JMenuItem();
+		
+		}
 	}
 	
 	/**
