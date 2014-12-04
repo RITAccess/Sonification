@@ -12,6 +12,7 @@ import java.awt.geom.GeneralPath;
 import java.io.File;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -32,6 +33,7 @@ public class Graph extends JPanel {
 	private Double multiplyVar = 1.0;
 	private Color[] colors;
 	private int position = 0;
+	private boolean dataGraph = true;
 	
 	public Graph(String filepath){
 		this(new File(filepath));
@@ -45,6 +47,7 @@ public class Graph extends JPanel {
 	public Graph(Data data){
 		Random rnd = new Random((long) Math.random()); // for colors of path
 		
+		this.setBorder(BorderFactory.createLineBorder(Color.black));
 		smallest = new Double[data.getData()[0].length];
 		largest = new Double[data.getData()[0].length];
 		for (int i = 0; i < data.getData()[0].length; i++){
@@ -82,8 +85,15 @@ public class Graph extends JPanel {
 			}
 			curves[i] = p;
 			colors[i] = new Color(rnd.nextFloat(),rnd.nextFloat(),rnd.nextFloat());
-			
 		}
+	}
+	
+	/**
+	 * Constructor with no data
+	 */
+	public Graph(){
+		this.setBorder(BorderFactory.createLineBorder(Color.black));
+		this.dataGraph = false;
 	}
 	
 	/**
@@ -107,6 +117,7 @@ public class Graph extends JPanel {
 	 * @param curve
 	 */
 	public void setCurveDrawn(int curve){
+		if (!dataGraph) { return; }
 		this.curveDrawn = curve;
 		if ((this.curveDrawn >= curves.length) || (this.curveDrawn < 0)){
 			this.curveDrawn = 0;
@@ -122,6 +133,14 @@ public class Graph extends JPanel {
 	 */
 	public int getCurveDrawn(){
 		return this.curveDrawn;
+	}
+	
+	/**
+	 * get the number of curves available
+	 * @return curves
+	 */
+	public int getCurves(){
+		return this.curves.length;
 	}
 
 	@Override
@@ -169,12 +188,14 @@ public class Graph extends JPanel {
 		/*
 		 * Drawing curves
 		 */
-		g2d.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		for (int i = curveDrawn; i < (curveDrawn == 0 ? curves.length : curveDrawn + 1); i++){
-			if (curves[i] != null){
-				// TODO make sure colors aren't similar / hurt
-				g2d.setColor(colors[i]);
-				g2d.draw(curves[i]);
+		if (this.dataGraph){
+			g2d.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			for (int i = curveDrawn; i < (curveDrawn == 0 ? curves.length : curveDrawn + 1); i++){
+				if (curves[i] != null){
+					// TODO make sure colors aren't similar / hurt
+					g2d.setColor(colors[i]);
+					g2d.draw(curves[i]);
+				}
 			}
 		}
 	}
@@ -192,6 +213,7 @@ public class Graph extends JPanel {
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Graph g = new Graph("/Users/Student/Downloads/download.csv");
+		//Graph g = new Graph();
 		f.add(g);
 		f.pack();
 		f.setVisible(true);
