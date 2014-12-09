@@ -1,27 +1,22 @@
 package com.sonification.audio;
 
 //Lesson1
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.sonification.data.Data;
+import com.sonification.data.DataConverter;
+
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.ugens.Gain;
-import net.beadsproject.beads.ugens.Noise;
-
-//Lesson 2
 import net.beadsproject.beads.data.Buffer;
-import net.beadsproject.beads.data.Pitch;
 import net.beadsproject.beads.ugens.Envelope;
-import net.beadsproject.beads.ugens.Glide;
 import net.beadsproject.beads.ugens.Panner;
-import net.beadsproject.beads.ugens.Spatial;
 import net.beadsproject.beads.ugens.WavePlayer;
-
-//Lesson 3
-import net.beadsproject.beads.ugens.Function;
-
-//Lesson 4
-import net.beadsproject.beads.data.SampleManager;
 import net.beadsproject.beads.events.KillTrigger;
-import net.beadsproject.beads.ugens.SamplePlayer;
 
 //Lesson 5
 import net.beadsproject.beads.ugens.Clock;
@@ -29,190 +24,197 @@ import net.beadsproject.beads.ugens.Clock;
 public class AudioPlayer {
 	
 	private AudioContext audioContext;
-	
-	public AudioPlayer()
+	private WavePlayer[] players;
+	private  final int interval = 500;
+	public AudioPlayer(Data data)
 	{
 		//Audio Context is needed to produce sounds
 		audioContext = new AudioContext();
+		players = WavePlayerFromData(data);
 	}
 	
-	public void testing()
-	{
-		float[][] locations = new float[2][1]; //Array for the speaker locations
-		locations[0][0] = 2f; //First speaker in dimension 1
-		locations[1][0] = 1f; //Second speaker in dimension 1
-		
-		Spatial spatial = new Spatial(
-				audioContext, //Audio Context
-				1, //Number of dimensions
-				locations, //Array containing the locations of the speakers
-				5 //Radius of the circle where speakers exist
-		);
-		Gain gain = new Gain(audioContext, 1, 0.5f); //Gain controls volume (Audio context, dimension, starting value[Max:1])
-
-		Envelope intervalEnvelope = new Envelope(audioContext, 0); //Encelope provides a value that changes over a given amount of time
-		intervalEnvelope.addSegment(1000, 1000); //(frequency, duration in miliseconds)
-		intervalEnvelope.addSegment(600, 1000);
-		intervalEnvelope.addSegment(1000, 1000);
-		intervalEnvelope.addSegment(400, 1000);
-		intervalEnvelope.addSegment(0, 1000);
-		//Wave player produces sound. 
-		WavePlayer wp = new WavePlayer(audioContext, intervalEnvelope, Buffer.SINE);//(AudioContext,Frequency,Type of sound)
-		
-		gain.addInput(wp);
-		spatial.addInput(gain);
-		audioContext.out.addInput(spatial); //If you replace spatial here for gain it makes sound
-		audioContext.start();
-	}
-
-	//Lesson 1
-	public void Lesson1()
-	{
-		//This is a UGen. UGens always have some form of audio inputs and outputs and audio processing/generation.
-		//All UGens take in a Audio Context
-		Noise noise = new Noise(audioContext);
-		
-		//This is a gain contol UGen. It takes in the numbe of channels and initial gain level repectivly. 
-		Gain gain = new Gain(audioContext, 1, 0.1f);
-		
-		//UGens can be added to eachother to combine effects.
-		gain.addInput(noise);
-		//Add to the context to play.
-		audioContext.out.addInput(gain);
-		
-		//Play your sounds.
-		audioContext.start();
-	}
-
-	//Lesson 2
-	public void Lesson2()
-	{
-		//Envelopes are used to modify other UGen objects.
-		Envelope freqEnv = new Envelope(audioContext,500);
-		WavePlayer wavePlay = new WavePlayer(audioContext, freqEnv, Buffer.SINE);
-		
-		freqEnv.addSegment(1000, 1000);
-		
-		Gain gain = new Gain(audioContext, 1, 0.1f);
-		gain.addInput(wavePlay);
-		audioContext.out.addInput(gain);
-		audioContext.start();
-	}
-	
-	//Lesson 3
-	public void Lesson3()
-	{
-		WavePlayer freqModulator = new WavePlayer(audioContext, 50, Buffer.SINE);
-		
-		Function function = new Function(freqModulator)
-		{
-			public float calculate() 
-			{
-				return x[0] * 100.0f + 600.0f;
-			}
-		};
-		
-		WavePlayer wp = new WavePlayer(audioContext, function, Buffer.SINE);
-		
-		Gain g = new Gain(audioContext, 1, 0.1f);
-		g.addInput(wp);
-		audioContext.out.addInput(g);
-		audioContext.start();
-	}
-	
-	//Lesson4
-	public void Lesson4()
-	{
-		String audioFile = "audio/1234.aif";
-		//SampleManager.setBufferRegime(Sample.Regime.newStreamingRegime(1000));
-		SamplePlayer player = new SamplePlayer(audioContext, SampleManager.sample(audioFile));
-		
-		Gain g = new Gain(audioContext, 1, 0.1f);
-		g.addInput(player);
-		audioContext.out.addInput(g);
-		audioContext.start();
-	}
-	
-	//Lesson5
-	public void Lesson5()
-	{
-		Envelope intervalEnvelope = new Envelope(audioContext, 1000);
-		intervalEnvelope.addSegment(600, 10000);
-		intervalEnvelope.addSegment(1000, 10000);
-		intervalEnvelope.addSegment(400, 10000);
-		intervalEnvelope.addSegment(1000, 10000);
-		
-		Clock clock = new Clock(audioContext, intervalEnvelope);
-		clock.setClick(true);
-		
-		audioContext.out.addDependent(clock);
-		audioContext.start();
-	}
-	
-	//Lesson7
-	public void Lesson7()
-	{
-		/*
-		 * In this example a Clock is used to trigger events. We do this by
-		 * adding a listener to the Clock (which is of type Bead).
-		 * 
-		 * The Bead is made on-the-fly. All we have to do is to give the Bead a
-		 * callback method to make notes.
-		 * 
-		 * This example is more sophisticated than the previous ones. It uses
-		 * nested code.
-		 */
-		Clock clock = new Clock(audioContext, 700);
+	public void Start(int graph)
+	{	
+		//The clock is used to make the notes play at intervals 
+		//rather than constantly
+		Clock clock = new Clock(audioContext, interval); 
 		clock.addMessageListener(
-				  //this is the on-the-fly bead
-				  new Bead() {
-				    //this is the method that we override to make the Bead do something
-				    int pitch;
-				     public void messageReceived(Bead message) {
-				        Clock c = (Clock)message;
-				        if(c.isBeat()) {
-				          //choose some nice frequencies
-				          if(random(1) < 0.5) return;
-				          pitch = Pitch.forceToScale((int)random(12), Pitch.dorian);
-				          float freq = Pitch.mtof(pitch + (int)random(5) * 12 + 32);
-				          WavePlayer wp = new WavePlayer(audioContext, freq, Buffer.SINE);
-				          Gain g = new Gain(audioContext, 1, new Envelope(audioContext, 0));
-				          g.addInput(wp);
-				          audioContext.out.addInput(g);
-				          ((Envelope)g.getGainUGen()).addSegment(0.1f, random(200));
-				          ((Envelope)g.getGainUGen()).addSegment(0, random(7000), new KillTrigger(g));
-				       }
-				       if(c.getCount() % 4 == 0) {
-				           //choose some nice frequencies
-				          int pitchAlt = pitch;
-				          if(random(1) < 0.2) pitchAlt = Pitch.forceToScale((int)random(12), Pitch.dorian) + (int)random(2) * 12;
-				          float freq = Pitch.mtof(pitchAlt + 32);
-				          WavePlayer wp = new WavePlayer(audioContext, freq, Buffer.SQUARE);
-				          Gain g = new Gain(audioContext, 1, new Envelope(audioContext, 0));
-				          g.addInput(wp);
-				          Panner p = new Panner(audioContext, random(1));
-				          p.addInput(g);
-				          audioContext.out.addInput(p);
-				          ((Envelope)g.getGainUGen()).addSegment(random(0.1), random(50));
-				          ((Envelope)g.getGainUGen()).addSegment(0, random(400), new KillTrigger(p));
-				       }
-				       if(c.getCount() % 4 == 0) {
-				          Noise n = new Noise(audioContext);
-				          Gain g = new Gain(audioContext, 1, new Envelope(audioContext, 0.05f));
-				          g.addInput(n);
-				          Panner p = new Panner(audioContext, random(0.5) + 0.5f);
-				          p.addInput(g);
-				          audioContext.out.addInput(p);
-				          ((Envelope)g.getGainUGen()).addSegment(0, random(100), new KillTrigger(p));
-				       }
-				     }
-				   }
-				 );
+				new Bead(){
+					private WavePlayer wavePlayer;
+					public void messageReceived(Bead message){
+						Clock c = (Clock)message;
+						if(c.isBeat()){
+					          Gain g = new Gain(audioContext, 1, new Envelope(audioContext, 1f));
+					          g.addInput(wavePlayer);
+					          Panner p = new Panner(audioContext, 0);
+					          p.addInput(g);
+					          audioContext.out.addInput(p);
+					          ((Envelope)g.getGainUGen()).addSegment(0, interval+interval/10, new KillTrigger(p));
+					    }
+						if(wavePlayer.getFrequency() < 0)
+						{
+							c.pause(true);
+						}
+					}
+					public Bead setInterval(WavePlayer nWavePlayer){
+						wavePlayer = nWavePlayer;
+						return this;
+					}
+				}.setInterval(players[1]) //The players index determins which line on the graph to play
+				);
+		
+		
+		
 		audioContext.out.addDependent(clock);
 		audioContext.start();
 	}
 	
-	public static float random(double x) {
-		return (float)(Math.random() * x);
+	/**
+	 * Generate a array of WavePlayers that will be based on the data
+	 * @param data
+	 * @return array of WavePlayers
+	 */
+	public WavePlayer[] WavePlayerFromData(Data data)
+	{
+		float[][] parsedData = ParseData(data);
+		
+		//The number of columns or different lines that will be represented on the graph
+		WavePlayer[] wpArray = new WavePlayer[parsedData.length];
+		float ranges[][] = FindRange(parsedData);
+		float num, value;
+		
+		Envelope intervalEnvelope = null;
+		for(int i = 0; i < parsedData.length; i++)
+		{
+			intervalEnvelope  = new Envelope(audioContext, 0);
+			
+			for(int n = 0; n < parsedData[i].length; n++)
+			{
+				value = parsedData[i][n];
+				num = (36*(value-ranges[i][0]))/ranges[i][2] + 28; //28 = starting note. 36 = range of notes. max is 28+36
+				num = (float) (Math.pow(2, (num-49)/12)* 440); //Piano freq equation
+				intervalEnvelope.addSegment(num,0); //Add a instant change to the new note.
+				intervalEnvelope.addSegment(num,interval); //Hold the note for the length of the interval
+			}
+			intervalEnvelope.addSegment(-1,0); //stop playing sound when it is over
+			wpArray[i] = new WavePlayer(audioContext, intervalEnvelope, Buffer.SINE); //Create the wavePlayer using the calcualted data
+		}
+		
+		return wpArray;
+	}
+	
+	/**
+	 * Finds the ranges of values within a set of data. 
+	 * @param data
+	 * @param collumns
+	 * @param rows
+	 * @return A 2D array of the ranges. the first index referes to the column. The second is min, max, and range in that order
+	 */
+	public float[][] FindRange(float[][] data)
+	{
+		float[][] ranges = new float[data.length][3];
+		float tempRange, temp, min, max;
+		for(int i = 0; i < data.length; i++)
+		{
+			tempRange = 0;
+			min = Float.POSITIVE_INFINITY;
+			max = Float.NEGATIVE_INFINITY;
+			for(int n = 0; n < data[i].length; n++)
+			{
+					temp = data[i][n];
+					//System.out.println("Value: " + temp);
+					if(temp < min)
+					{
+						min = temp;
+					}
+					if(temp > max)
+					{
+						max = temp;
+					}
+				
+			}
+			tempRange = max - min;
+			min -= tempRange/10;
+			max += tempRange/10;
+			tempRange = max - min;
+			ranges[i][0] = min;
+			ranges[i][1] = max;
+			ranges[i][2] = tempRange;
+			//System.out.println("Range: " + tempRange + " Min: " + min + " Max: " + max);
+		}
+		return ranges;
+	}
+	
+	/**
+	 * Generates a 2D array of floats from the given data. 
+	 * The array contains all columns and their valid values. 
+	 * A column is considered invalid if over 25% cannot be parsed to a float.
+	 * @param data
+	 * @return
+	 */
+	public float[][] ParseData(Data data)
+	{
+		int numColumns = data.getTitles().length;
+		List<float[]> myList = new ArrayList<float[]>();
+		
+		for(int i = 0; i < numColumns; ++i)
+		{
+			String[] tempColumn = data.get(i);
+			float[] column = new float[tempColumn.length];
+			
+			int numInvalid = 0;
+			float oneFourth = tempColumn.length * .25f;
+			for(int n = 0; n < tempColumn.length; ++n)
+			{
+				try
+				{
+					column[n-numInvalid] = Float.parseFloat(tempColumn[n]);
+					//System.out.println("Data: " + column[n]);
+				}
+				catch(Exception e)
+				{
+					System.err.println("Failed to parse! " + tempColumn[n]);
+					numInvalid++;
+				}
+			}
+			
+			//If over 25% of the column is invalid then skip the column
+			if(numInvalid < oneFourth)
+			{
+				float[] temp = new float[column.length-numInvalid];
+				temp = Arrays.copyOf(column, temp.length);
+				myList.add(temp);
+			}
+		}
+		
+		float[][] array = new float[myList.size()][];
+		for(int i = 0; i < myList.size(); i++)
+		{
+			array[i] = myList.get(i);
+			for(int n = 0; n < myList.get(i).length; n++)
+			{
+				array[i][n] = myList.get(i)[n];
+				//System.out.println("DATA PRINTING: " + array[i][n]);
+			}
+		}
+		
+		return array;
+	}
+
+
+
+	public static void main(String[] args)
+	{
+		AudioPlayer ap = new AudioPlayer(new DataConverter(new File("/Users/Student/Downloads/testingcsv.csv")).readCSVFile());
+		ap.Start(0);
+
+		//AudioTestMain test = new AudioTestMain();
+		//test.Lesson1();
+		//test.Lesson2();
+		//test.Lesson3();
+		//test.Lesson4();
+		//test.Lesson5();
+		//test.Lesson7();
+		//test..testing();
 	}
 }
