@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="/jbrick/lib/jna.jar"/>
 	<classpathentry kind="lib" path="/jbrick/lib/AppleJavaExtensions.jar"/>
 	<classpathentry kind="lib" path="/jbrick/lib/jfxrt.jar"/>
+	<classpathentry kind="lib" path="lib/jfugue-4.0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
